@@ -463,10 +463,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
   showLoading('正在加载图片...');
   const reader = new FileReader();
   reader.onload = function(ev) {
-    const dataUrl = ev.target.result;
-    loadPhotoFromDataUrl(dataUrl);
-    hideLoading();
-    document.getElementById('saveBtn').disabled = false;
+    loadPhotoFromDataUrl(ev.target.result);
   };
   reader.readAsDataURL(file);
   this.value = '';
@@ -476,26 +473,22 @@ function loadPhotoFromDataUrl(dataUrl) {
   const img = new Image();
   img.onload = function() {
     if (currentPhoto) canvas.remove(currentPhoto);
-
     let w = img.width, h = img.height;
     const maxDim = 1500;
     let scale = 1;
     if (w > maxDim || h > maxDim) {
       scale = Math.min(maxDim / w, maxDim / h);
     }
-
-    const c = document.createElement('canvas');
-    c.width = Math.round(w * scale);
-    c.height = Math.round(h * scale);
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-
-    const resized = new Image();
-    resized.onload = function() {
+    const t = document.createElement('canvas');
+    t.width = Math.round(w * scale);
+    t.height = Math.round(h * scale);
+    t.getContext('2d').drawImage(img, 0, 0, t.width, t.height);
+    const r = new Image();
+    r.onload = function() {
       const cw = canvas.width, ch = canvas.height;
-      const s = Math.max(cw / resized.width, ch / resized.height) * 0.92;
-      const fimg = new fabric.Image(resized, {
-        scaleX: s, scaleY: s,
-        left: cw / 2, top: ch / 2,
+      const s = Math.max(cw / r.width, ch / r.height) * 0.92;
+      const fimg = new fabric.Image(r, {
+        scaleX: s, scaleY: s, left: cw / 2, top: ch / 2,
         originX: 'center', originY: 'center'
       });
       canvas.add(fimg);
@@ -504,8 +497,10 @@ function loadPhotoFromDataUrl(dataUrl) {
       if (currentYearGroup) currentYearGroup.bringToFront();
       currentPhoto = fimg;
       canvas.requestRenderAll();
+      hideLoading();
+      document.getElementById('saveBtn').disabled = false;
     };
-    resized.src = c.toDataURL('image/jpeg', 0.85);
+    r.src = t.toDataURL('image/jpeg', 0.85);
   };
   img.src = dataUrl;
 }
@@ -581,6 +576,7 @@ function selectFrame(index, el) {
   if (currentYearGroup) currentYearGroup.bringToFront();
   currentFrame = fimg;
   canvas.requestRenderAll();
+  document.getElementById('saveBtn').disabled = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -646,22 +642,57 @@ function drawYearRibbon(year) {
   currentYearGroup = group;
   canvas.setActiveObject(group);
   canvas.requestRenderAll();
+  document.getElementById('saveBtn').disabled = false;
 }
 
 /* ===== Save ===== */
 document.getElementById('saveBtn').addEventListener('click', function() {
-  if (!canvas) return;
+  if (!canvas || canvas.getObjects().length === 0) return;
   canvas.discardActiveObject();
   canvas.renderAll();
-  const mult = Math.max(1080 / canvas.width, 2);
+  const outSize = 1080;
+  const mult = Math.max(outSize / canvas.width, 2);
   try {
     const data = canvas.toDataURL({ format: 'jpeg', quality: 0.92, multiplier: mult });
     document.getElementById('resultImg').src = data;
     document.getElementById('saveModal').classList.add('show');
   } catch (e) {
-    alert('保存失败。请尝试通过本地服务器打开页面（参考下方提示）。');
+    console.error('Fabric export failed:', e);
+    fallbackSave();
   }
 });
+
+function fallbackSave() {
+  try {
+    const outSize = 1080;
+    const tmp = document.createElement('canvas');
+    tmp.width = outSize;
+    tmp.height = outSize;
+    const ctx = tmp.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, outSize, outSize);
+    const scale = outSize / canvas.width;
+    canvas.forEachObject(function(obj) {
+      if (obj.type === 'image' && obj._img) {
+        const img = obj._img;
+        const dw = img.width * obj.scaleX * scale;
+        const dh = img.height * obj.scaleY * scale;
+        const dx = (obj.left - (obj.width * obj.scaleX * obj.originX === 'center' ? 0.5 : 0)) * scale;
+        const dy = (obj.top - (obj.height * obj.scaleY * obj.originY === 'center' ? 0.5 : 0)) * scale;
+        ctx.globalAlpha = obj.opacity || 1;
+        ctx.drawImage(img, dx, dy, dw, dh);
+        ctx.globalAlpha = 1;
+      }
+    });
+    const data = tmp.toDataURL('image/jpeg', 0.92);
+    document.getElementById('resultImg').src = data;
+    document.getElementById('saveModal').classList.add('show');
+  } catch (e2) {
+    console.error('Fallback export also failed:', e2);
+    alert('保存失败，可能是画布被浏览器安全策略限制。请尝试：\n1. 使用 Chrome 浏览器\n2. 通过 HTTPS 访问（当前已是）');
+  }
+}
+
 document.getElementById('closeModal').addEventListener('click', function() {
   document.getElementById('saveModal').classList.remove('show');
 });
