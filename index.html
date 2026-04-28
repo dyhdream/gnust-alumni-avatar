@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>赣南科技学院 · 校友专属头像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.staticfile.net/fabric.js/5.3.1/fabric.min.js"></script>
+<style>
+:root {
+  --primary: #D82128;
+  --primary-dark: #A01A20;
+  --primary-light: #FDE8E9;
+  --gold: #C9A84C;
+  --gold-light: #F5EDD6;
+  --bg: #F8F6F3;
+  --bg-card: #FFFFFF;
+  --text: #1A1A1A;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --border: #E8E5E0;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+
+/* ===== P1 Landing ===== */
+#page1{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:20;
+  background:linear-gradient(160deg,var(--primary-dark) 0%,var(--primary) 40%,#C41E24 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.6s ease,transform 0.6s ease;
+}
+#page1.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+.p1-deco{
+  position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none;
+}
+.p1-deco span{
+  position:absolute;display:block;width:6px;height:6px;background:rgba(255,255,255,0.12);
+  border-radius:50%;animation:floatUp 8s ease-in-out infinite;
+}
+@keyframes floatUp{
+  0%,100%{transform:translateY(0) scale(1);opacity:0}
+  10%{opacity:1}
+  90%{opacity:0}
+  100%{transform:translateY(-100vh) scale(0.5)}
+}
+.p1-logo{width:80px;height:80px;margin-bottom:16px;position:relative;z-index:1}
+.p1-logo img{width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1)}
+.p1-title{
+  font-family:"Noto Serif SC",serif;font-size:clamp(28px,5.5vw,48px);font-weight:700;
+  color:#fff;text-align:center;line-height:1.3;position:relative;z-index:1;
+  letter-spacing:4px;text-shadow:0 2px 12px rgba(0,0,0,0.2);
+}
+.p1-sub{
+  font-size:clamp(14px,2.5vw,20px);color:rgba(255,255,255,0.75);margin-top:10px;
+  letter-spacing:6px;position:relative;z-index:1;
+}
+.p1-line{width:60px;height:2px;background:var(--gold);margin:24px auto;border-radius:1px;position:relative;z-index:1}
+.p1-desc{
+  font-size:14px;color:rgba(255,255,255,0.6);text-align:center;line-height:1.8;
+  letter-spacing:1px;position:relative;z-index:1;
+}
+.p1-btn{
+  margin-top:36px;padding:14px 52px;border:none;border-radius:50px;
+  background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);
+  color:#fff;font-size:17px;font-weight:600;letter-spacing:2px;
+  cursor:pointer;transition:var(--transition);position:relative;z-index:1;
+  border:1px solid rgba(255,255,255,0.25);
+}
+.p1-btn:hover{background:rgba(255,255,255,0.28);transform:translateY(-1px)}
+.p1-btn:active{transform:scale(0.97)}
+.p1-arrow{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  width:18px;height:18px;border-left:2px solid rgba(255,255,255,0.4);
+  border-top:2px solid rgba(255,255,255,0.4);transform-origin:center;
+  animation:bounceUp 1.8s infinite;z-index:1;
+}
+@keyframes bounceUp{
+  0%,100%{transform:translateX(-50%) translateY(0) rotate(45deg);opacity:0}
+  50%{opacity:1}
+  80%{transform:translateX(-50%) translateY(-16px) rotate(45deg);opacity:0}
+}
+
+/* ===== P2 Editor ===== */
+#page2{
+  width:100%;min-height:100vh;overflow-y:auto;overflow-x:hidden;
+  background:var(--bg);position:relative;padding:0 0 40px;
+  opacity:0;transition:opacity 0.5s ease 0.1s;
+}
+#page2.show{opacity:1}
+
+.p2-header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+  padding:20px 16px 24px;text-align:center;position:relative;
+}
+.p2-header-inner{display:flex;align-items:center;justify-content:center;gap:12px}
+.p2-header .logo-icon{width:36px;height:36px;flex-shrink:0}
+.p2-header .logo-icon img{width:100%;height:100%;object-fit:contain;filter:brightness(0) invert(1)}
+.p2-header .school-name{
+  font-family:"Noto Serif SC",serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;
+}
+.p2-header .tagline{font-size:12px;color:rgba(255,255,255,0.65);margin-top:4px;letter-spacing:3px}
+
+/* Canvas */
+.canvas-wrap{
+  margin:20px auto 0;width:88vw;max-width:440px;aspect-ratio:1/1;
+  background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);
+  overflow:hidden;position:relative;touch-action:none;
+}
+.canvas-wrap canvas{width:100%!important;height:100%!important;display:block}
+.placeholder{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#FCFCFC;border:2px dashed var(--border);border-radius:var(--radius-lg);
+  cursor:pointer;z-index:10;transition:opacity 0.3s;
+}
+.placeholder.hidden{opacity:0;pointer-events:none}
+.placeholder-icon{width:44px;height:44px;color:var(--text-tertiary);margin-bottom:12px}
+.placeholder-text{color:var(--text-tertiary);font-size:13px;text-align:center;line-height:1.7}
+
+/* Hint */
+.hint-text{
+  text-align:center;color:var(--text-secondary);font-size:12px;
+  margin:14px auto 0;line-height:1.7;
+}
+
+/* Actions */
+.actions{
+  display:flex;gap:12px;width:88vw;max-width:440px;margin:14px auto 0;
+}
+.btn{
+  flex:1;padding:12px 0;text-align:center;border-radius:var(--radius-md);
+  font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);
+  position:relative;overflow:hidden;
+}
+.btn-upload{
+  background:#fff;color:var(--primary);border:1.5px solid var(--primary);
+}
+.btn-upload:hover{background:var(--primary-light)}
+.btn-upload:active{transform:scale(0.97)}
+.btn-upload input[type=file]{
+  opacity:0;position:absolute;left:0;top:0;width:100%;height:100%;cursor:pointer;
+}
+.btn-save{
+  background:var(--primary);color:#fff;border:1.5px solid var(--primary);
+}
+.btn-save:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
+.btn-save:active{transform:scale(0.97)}
+.btn-save:disabled{opacity:0.5;cursor:not-allowed}
+
+/* Tabs */
+.tabs{
+  display:flex;width:88vw;max-width:440px;margin:18px auto 0;
+  background:var(--bg-card);border-radius:var(--radius-md);
+  overflow:hidden;border:1px solid var(--border);
+}
+.tab{
+  flex:1;text-align:center;padding:11px 0;font-size:14px;font-weight:500;
+  color:var(--text-secondary);cursor:pointer;transition:var(--transition);
+  position:relative;
+}
+.tab.active{color:var(--primary);font-weight:600}
+.tab.active::after{
+  content:'';position:absolute;bottom:0;left:20%;width:60%;height:2.5px;
+  background:var(--primary);border-radius:2px 2px 0 0;
+}
+.tab:active{background:var(--primary-light)}
+
+/* Frames Grid */
+.frame-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  width:88vw;max-width:440px;margin:12px auto 0;
+}
+.frame-item{
+  aspect-ratio:1/1;border-radius:var(--radius-md);
+  border:1.5px solid var(--border);overflow:hidden;cursor:pointer;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  padding:12px;transition:var(--transition);
+}
+.frame-item:hover{border-color:var(--text-tertiary)}
+.frame-item.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light)}
+.frame-item img{width:100%;height:100%;object-fit:contain}
+.frame-label{
+  font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:4px;line-height:1.2;
+}
+
+/* Elements Panel (placeholder) */
+#elements-panel{display:none}
+.elements-placeholder{
+  width:88vw;max-width:440px;margin:20px auto 0;
+  text-align:center;padding:40px 20px;color:var(--text-tertiary);font-size:13px;line-height:1.8;
+  background:var(--bg-card);border-radius:var(--radius-md);border:1px dashed var(--border);
+}
+.elements-placeholder strong{color:var(--primary);font-weight:600}
+
+/* Year Selector */
+.year-section{
+  width:88vw;max-width:440px;margin:16px auto 0;
+  background:#fff;border-radius:var(--radius-md);
+  padding:14px 16px;border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.year-input{
+  width:100px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:15px;font-weight:600;text-align:center;outline:none;transition:var(--transition);
+  color:var(--text);flex-shrink:0;
+}
+.year-input:focus{border-color:var(--primary)}
+.year-suffix{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap}
+.btn-year{
+  padding:7px 16px;border:none;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);
+}
+.btn-year-confirm{background:var(--primary);color:#fff}
+.btn-year-confirm:hover{background:var(--primary-dark)}
+.btn-year-confirm:active{transform:scale(0.97)}
+.btn-year-clear{background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)}
+.btn-year-clear:hover{background:var(--border)}
+
+/* Modal */
+#saveModal{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;
+  background:rgba(0,0,0,0.85);display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px;
+}
+#saveModal.show{display:flex}
+.modal-card{
+  background:#fff;border-radius:var(--radius-lg);padding:24px;width:100%;max-width:400px;
+  text-align:center;
+}
+.modal-tip{font-size:15px;font-weight:600;color:var(--primary);margin-bottom:16px}
+.modal-card img{width:100%;border-radius:var(--radius-md);margin-bottom:16px}
+.btn-close{
+  padding:10px 32px;border:none;border-radius:50px;
+  background:var(--primary);color:#fff;font-size:15px;font-weight:600;
+  cursor:pointer;transition:var(--transition);
+}
+.btn-close:hover{background:var(--primary-dark)}
+
+/* Loading */
+#loadingOverlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;
+  background:rgba(255,255,255,0.92);display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+#loadingOverlay.show{display:flex}
+.spinner{
+  width:38px;height:38px;border:3px solid var(--border);
+  border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingText{margin-top:16px;font-size:15px;font-weight:500;color:var(--primary)}
+
+/* Responsive */
+@media(min-width:600px){
+  .frame-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== P1: Landing ===== -->
+<div id="page1">
+  <div class="p1-deco" id="p1Deco"></div>
+  <div class="p1-logo"><img src="assets/frames/03-标准图形.png" alt="赣南科技学院"></div>
+  <div class="p1-title">赣南科技学院</div>
+  <div class="p1-sub">校 友 专 属 头 像</div>
+  <div class="p1-line"></div>
+  <div class="p1-desc">百廿赣科 · 换装同行<br>快来领取你的校友专属头像</div>
+  <button class="p1-btn" id="enterBtn">开 始 制 作</button>
+  <div class="p1-arrow"></div>
+</div>
+
+<!-- ===== P2: Editor ===== -->
+<div id="page2">
+  <div class="p2-header">
+    <div class="p2-header-inner">
+      <div class="logo-icon"><img src="assets/frames/03-标准图形.png" alt="校徽"></div>
+      <span class="school-name">赣南科技学院</span>
+    </div>
+    <div class="tagline">校 友 专 属 头 像 制 作</div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div class="placeholder" id="placeholder">
+      <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+      <div class="placeholder-text">点击下方选择头像框<br>或点击"上传头像"开始制作</div>
+    </div>
+  </div>
+
+  <div class="hint-text" id="hintText">点击选择头像框，头像主体居中效果更佳</div>
+
+  <div class="actions">
+    <button class="btn btn-upload">
+      上传头像
+      <input type="file" id="fileInput" accept="image/*">
+    </button>
+    <button class="btn btn-save" id="saveBtn" disabled>保存相册</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-target="frames-panel">头像框</div>
+    <div class="tab" data-target="elements-panel">自定义元素</div>
+  </div>
+
+  <div class="frame-grid" id="frames-panel"></div>
+
+  <div id="elements-panel">
+    <div class="elements-placeholder">
+      <strong>暂无装饰元素</strong><br>
+      后续可将 PNG 素材放入 <code>assets/elements/</code> 目录<br>
+      然后在页面中添加即可使用
+    </div>
+  </div>
+
+  <div class="year-section" id="yearSection">
+    <span style="font-size:16px;font-weight:600;color:var(--primary)">届</span>
+    <input class="year-input" id="yearInput" type="text" inputmode="numeric" maxlength="4" placeholder="如 2021">
+    <span class="year-suffix">届校友</span>
+    <button class="btn-year btn-year-confirm" id="yearConfirm">确认</button>
+    <button class="btn-year btn-year-clear" id="yearClear">清除</button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="saveModal">
+  <div class="modal-card">
+    <div class="modal-tip">长按或右键保存图片</div>
+    <img id="resultImg" src="" alt="头像预览">
+    <button class="btn-close" id="closeModal">关闭 / 返回修改</button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingText">正在利用 AI 为您抠图处理中...</div>
+</div>
+
+<script>
+/* ===== Configuration ===== */
+const FRAMES = [
+  { file:'01-标准色-横版.png', label:'标准色·横版' },
+  { file:'02-标准色-竖版.png', label:'标准色·竖版' },
+  { file:'03-标准图形.png',    label:'标准图形' },
+  { file:'04-反白色-横版.png', label:'反白色·横版' },
+  { file:'05-反白色-竖版.png', label:'反白色·竖版' },
+  { file:'06-墨色-横版.png',   label:'墨色·横版' },
+  { file:'07-墨色-竖版.png',   label:'墨色·竖版' },
+];
+
+/* ===== Preload frame images (avoids CORS file:// issues) ===== */
+const frameCache = {};
+
+FRAMES.forEach(f => {
+  const img = new Image();
+  img.onload = () => { frameCache[f.file] = img; };
+  img.src = 'assets/frames/' + f.file;
+});
+
+/* ===== P1 Floating particles ===== */
+(function(){
+  const c = document.getElementById('p1Deco');
+  for(let i=0;i<30;i++){
+    const d = document.createElement('span');
+    d.style.left = Math.random()*100+'%';
+    d.style.animationDelay = Math.random()*8+'s';
+    d.style.animationDuration = (6+Math.random()*6)+'s';
+    d.style.width = d.style.height = (2+Math.random()*6)+'px';
+    c.appendChild(d);
+  }
+})();
+
+/* ===== Page transition ===== */
+document.getElementById('enterBtn').addEventListener('click',()=>{
+  document.getElementById('page1').classList.add('hidden');
+  const p2 = document.getElementById('page2');
+  p2.classList.add('show');
+  document.body.style.overflowY='auto';
+  document.documentElement.style.overflowY='auto';
+  window.scrollTo(0,0);
+  initCanvas();
+});
+
+/* ===== Canvas setup ===== */
+let canvas, currentPhoto, currentFrame, currentYearGroup;
+let canvasInitialized = false;
+
+function getCanvasSize() {
+  const vw = window.innerWidth;
+  const maxW = Math.min(vw * 0.88, 440);
+  return Math.floor(maxW);
+}
+
+function initCanvas() {
+  if (canvasInitialized) return;
+  canvasInitialized = true;
+
+  const sz = getCanvasSize();
+  document.getElementById('c').width = sz;
+  document.getElementById('c').height = sz;
+
+  fabric.Object.prototype.transparentCorners = false;
+  fabric.Object.prototype.cornerColor = 'rgba(216,33,40,0.7)';
+  fabric.Object.prototype.borderColor = 'rgba(216,33,40,0.5)';
+  fabric.Object.prototype.cornerSize = 10;
+
+  const delSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ef4444'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8 8l8 8M16 8l-8 8' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E";
+  const delImg = document.createElement('img');
+  delImg.src = delSvg;
+
+  fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+    x:0.5, y:-0.5, offsetY:24, offsetX:-24,
+    cursorStyle:'pointer',
+    mouseUpHandler:function(e,t){
+      const target = t.target;
+      if(canvas){canvas.remove(target);canvas.requestRenderAll()}
+      if(target===currentPhoto) currentPhoto=null;
+      if(target===currentFrame) currentFrame=null;
+      if(target===currentYearGroup) currentYearGroup=null;
+    },
+    render:function(ctx,l,t,s,o){
+      const sz2=18; ctx.save(); ctx.translate(l,t); ctx.drawImage(delImg,-sz2/2,-sz2/2,sz2,sz2); ctx.restore();
+    },
+    cornerSize:22
+  });
+
+  canvas = new fabric.Canvas('c', { backgroundColor:'#ffffff', preserveObjectStacking:true });
+  updatePlaceholder();
+  canvas.on('object:added', updatePlaceholder);
+  canvas.on('object:removed', updatePlaceholder);
+  buildFrameGrid();
+}
+
+/* ===== Placeholder ===== */
+function updatePlaceholder() {
+  const p = document.getElementById('placeholder');
+  if (!canvas) return;
+  if (canvas.getObjects().length === 0) {
+    p.classList.remove('hidden');
+  } else {
+    p.classList.add('hidden');
+  }
+}
+
+document.getElementById('placeholder').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
+
+/* ===== Image upload ===== */
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  if (!e.target.files.length) return;
+  const file = e.target.files[0];
+  showLoading('正在加载图片...');
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    loadPhotoFromDataUrl(dataUrl);
+    hideLoading();
+    document.getElementById('saveBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+function loadPhotoFromDataUrl(dataUrl) {
+  const img = new Image();
+  img.onload = function() {
+    if (currentPhoto) canvas.remove(currentPhoto);
+
+    let w = img.width, h = img.height;
+    const maxDim = 1500;
+    let scale = 1;
+    if (w > maxDim || h > maxDim) {
+      scale = Math.min(maxDim / w, maxDim / h);
+    }
+
+    const c = document.createElement('canvas');
+    c.width = Math.round(w * scale);
+    c.height = Math.round(h * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+
+    const resized = new Image();
+    resized.onload = function() {
+      const cw = canvas.width, ch = canvas.height;
+      const s = Math.max(cw / resized.width, ch / resized.height) * 0.92;
+      const fimg = new fabric.Image(resized, {
+        scaleX: s, scaleY: s,
+        left: cw / 2, top: ch / 2,
+        originX: 'center', originY: 'center'
+      });
+      canvas.add(fimg);
+      fimg.sendToBack();
+      if (currentFrame) currentFrame.bringToFront();
+      if (currentYearGroup) currentYearGroup.bringToFront();
+      currentPhoto = fimg;
+      canvas.requestRenderAll();
+    };
+    resized.src = c.toDataURL('image/jpeg', 0.85);
+  };
+  img.src = dataUrl;
+}
+
+/* ===== Frame grid ===== */
+function buildFrameGrid() {
+  const grid = document.getElementById('frames-panel');
+  grid.innerHTML = '';
+  FRAMES.forEach((f, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column';
+    const div = document.createElement('div');
+    div.className = 'frame-item';
+    div.dataset.index = i;
+    const thumb = document.createElement('img');
+    thumb.src = 'assets/frames/' + f.file;
+    thumb.alt = f.label;
+    thumb.loading = 'lazy';
+    div.appendChild(thumb);
+    wrap.appendChild(div);
+    const label = document.createElement('div');
+    label.className = 'frame-label';
+    label.textContent = f.label;
+    wrap.appendChild(label);
+    grid.appendChild(wrap);
+
+    div.addEventListener('click', function(e) {
+      if (div.classList.contains('selected')) {
+        div.classList.remove('selected');
+        if (currentFrame) { canvas.remove(currentFrame); currentFrame = null; canvas.requestRenderAll(); }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      selectFrame(i, div);
+    });
+  });
+}
+
+function selectFrame(index, el) {
+  document.querySelectorAll('.frame-item').forEach(x => x.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  const frame = FRAMES[index];
+  if (currentFrame) { canvas.remove(currentFrame); currentFrame = null; }
+
+  const imgEl = frameCache[frame.file];
+  if (!imgEl || !imgEl.complete) return;
+
+  const cw = canvas.width, ch = canvas.height;
+  const sx = cw / imgEl.width,
+        sy = ch / imgEl.height,
+        s = Math.max(sx, sy);
+
+  const fimg = new fabric.Image(imgEl, {
+    scaleX: s, scaleY: s,
+    left: cw / 2, top: ch / 2,
+    originX: 'center', originY: 'center',
+    selectable: true, evented: true,
+    lockMovementX: true, lockMovementY: true,
+    lockScalingX: true, lockScalingY: true,
+    lockRotation: true,
+    hasBorders: false, hoverCursor: 'default',
+    opacity: 0.8
+  });
+
+  fimg.setControlsVisibility({
+    bl: false, br: false, mb: false, ml: false, mr: false,
+    mt: false, tl: false, tr: false, mtr: false
+  });
+
+  canvas.add(fimg);
+  if (currentPhoto) currentPhoto.sendToBack();
+  fimg.bringToFront();
+  if (currentYearGroup) currentYearGroup.bringToFront();
+  currentFrame = fimg;
+  canvas.requestRenderAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== Tabs ===== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    const t = this.dataset.target;
+    const isFrames = t === 'frames-panel';
+    document.getElementById('frames-panel').style.display = isFrames ? 'grid' : 'none';
+    document.getElementById('elements-panel').style.display = isFrames ? 'none' : 'block';
+    document.getElementById('hintText').textContent = isFrames
+      ? '点击选择头像框，头像主体居中效果更佳'
+      : '暂无装饰元素，后续可自行添加';
+  });
+});
+
+/* ===== Year ===== */
+document.getElementById('yearConfirm').addEventListener('click', applyYear);
+document.getElementById('yearInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); applyYear(); }
+});
+document.getElementById('yearInput').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '');
+});
+document.getElementById('yearClear').addEventListener('click', function() {
+  document.getElementById('yearInput').value = '';
+  if (currentYearGroup) { canvas.remove(currentYearGroup); currentYearGroup = null; canvas.requestRenderAll(); }
+});
+
+function applyYear() {
+  const val = document.getElementById('yearInput').value.trim();
+  if (!val || !/^\d{4}$/.test(val)) return;
+  const y = parseInt(val);
+  if (y < 1906 || y > 2030) return;
+  drawYearRibbon(val);
+}
+
+function drawYearRibbon(year) {
+  if (currentYearGroup) { canvas.remove(currentYearGroup); currentYearGroup = null; }
+  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+  const text = new fabric.Text(year + '届校友', {
+    fontSize: 22, fill: '#fff', fontFamily: 'sans-serif', fontWeight: 'bold',
+    originX: 'center', originY: 'center'
+  });
+  const pad = 16;
+  const bg = new fabric.Rect({
+    left: -text.width / 2 - pad, top: -text.height / 2 - pad / 2,
+    width: text.width + pad * 2, height: text.height + pad,
+    fill: primaryColor, rx: 20, ry: 20,
+    originX: 'left', originY: 'top'
+  });
+  const group = new fabric.Group([bg, text], {
+    left: canvas.width * 0.04, top: canvas.width * 0.04,
+    originX: 'left', originY: 'top',
+    selectable: true, hasControls: true,
+    cornerColor: '#ef4444', borderColor: '#ef4444',
+    cornerSize: 8
+  });
+  canvas.add(group);
+  group.bringToFront();
+  currentYearGroup = group;
+  canvas.setActiveObject(group);
+  canvas.requestRenderAll();
+}
+
+/* ===== Save ===== */
+document.getElementById('saveBtn').addEventListener('click', function() {
+  if (!canvas) return;
+  canvas.discardActiveObject();
+  canvas.renderAll();
+  const mult = Math.max(1080 / canvas.width, 2);
+  try {
+    const data = canvas.toDataURL({ format: 'jpeg', quality: 0.92, multiplier: mult });
+    document.getElementById('resultImg').src = data;
+    document.getElementById('saveModal').classList.add('show');
+  } catch (e) {
+    alert('保存失败。请尝试通过本地服务器打开页面（参考下方提示）。');
+  }
+});
+document.getElementById('closeModal').addEventListener('click', function() {
+  document.getElementById('saveModal').classList.remove('show');
+});
+
+/* ===== Loading ===== */
+function showLoading(t) {
+  document.getElementById('loadingText').textContent = t || '处理中...';
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+/* ===== Canvas resize on orientation change ===== */
+window.addEventListener('resize', function() {
+  if (!canvas || !canvasInitialized) return;
+  const newSz = getCanvasSize();
+  if (Math.abs(newSz - canvas.width) > 5) {
+    const scale = newSz / canvas.width;
+    canvas.setDimensions({ width: newSz, height: newSz });
+    canvas.getObjects().forEach(function(obj) {
+      obj.left = obj.left * scale;
+      obj.top = obj.top * scale;
+      if (obj.scaleX) obj.scaleX = obj.scaleX * scale;
+      if (obj.scaleY) obj.scaleY = obj.scaleY * scale;
+    });
+    canvas.requestRenderAll();
+  }
+});
+</script>
+</body>
+</html>
