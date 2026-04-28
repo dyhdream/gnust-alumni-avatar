@@ -650,48 +650,24 @@ document.getElementById('saveBtn').addEventListener('click', function() {
   if (!canvas || canvas.getObjects().length === 0) return;
   canvas.discardActiveObject();
   canvas.renderAll();
-  const outSize = 1080;
-  const mult = Math.max(outSize / canvas.width, 2);
-  try {
-    const data = canvas.toDataURL({ format: 'jpeg', quality: 0.92, multiplier: mult });
-    document.getElementById('resultImg').src = data;
-    document.getElementById('saveModal').classList.add('show');
-  } catch (e) {
-    console.error('Fabric export failed:', e);
-    fallbackSave();
-  }
-});
 
-function fallbackSave() {
+  const exportSize = 1080;
   try {
-    const outSize = 1080;
     const tmp = document.createElement('canvas');
-    tmp.width = outSize;
-    tmp.height = outSize;
+    tmp.width = exportSize;
+    tmp.height = exportSize;
     const ctx = tmp.getContext('2d');
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, outSize, outSize);
-    const scale = outSize / canvas.width;
-    canvas.forEachObject(function(obj) {
-      if (obj.type === 'image' && obj._img) {
-        const img = obj._img;
-        const dw = img.width * obj.scaleX * scale;
-        const dh = img.height * obj.scaleY * scale;
-        const dx = (obj.left - (obj.width * obj.scaleX * obj.originX === 'center' ? 0.5 : 0)) * scale;
-        const dy = (obj.top - (obj.height * obj.scaleY * obj.originY === 'center' ? 0.5 : 0)) * scale;
-        ctx.globalAlpha = obj.opacity || 1;
-        ctx.drawImage(img, dx, dy, dw, dh);
-        ctx.globalAlpha = 1;
-      }
-    });
+    ctx.fillRect(0, 0, exportSize, exportSize);
+    ctx.drawImage(canvas.lowerCanvasEl, 0, 0, exportSize, exportSize);
     const data = tmp.toDataURL('image/jpeg', 0.92);
     document.getElementById('resultImg').src = data;
     document.getElementById('saveModal').classList.add('show');
-  } catch (e2) {
-    console.error('Fallback export also failed:', e2);
-    alert('保存失败，可能是画布被浏览器安全策略限制。请尝试：\n1. 使用 Chrome 浏览器\n2. 通过 HTTPS 访问（当前已是）');
+  } catch (e) {
+    console.error('Save failed:', e);
+    alert('保存失败：' + e.message);
   }
-}
+});
 
 document.getElementById('closeModal').addEventListener('click', function() {
   document.getElementById('saveModal').classList.remove('show');
