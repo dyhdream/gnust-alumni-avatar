@@ -500,8 +500,8 @@ function loadPhotoFromDataUrl(dataUrl) {
         originX: 'center', originY: 'center'
       });
       canvas.add(fimg);
-      fimg.sendToBack();
-      if (currentFrame) currentFrame.bringToFront();
+      fimg.bringToFront();
+      if (currentFrame) currentFrame.sendToBack();
       if (currentYearGroup) currentYearGroup.bringToFront();
       currentPhoto = fimg;
       canvas.requestRenderAll();
@@ -557,16 +557,15 @@ function selectFrame(index, el) {
     lockMovementX: true, lockMovementY: true,
     lockScalingX: true, lockScalingY: true,
     lockRotation: true,
-    hasBorders: false, hoverCursor: 'default',
-    opacity: 0.65
+    hasBorders: false, hoverCursor: 'default'
   });
   fimg.setControlsVisibility({
     bl: false, br: false, mb: false, ml: false, mr: false,
     mt: false, tl: false, tr: false, mtr: false
   });
   canvas.add(fimg);
-  if (currentPhoto) currentPhoto.sendToBack();
-  fimg.bringToFront();
+  fimg.sendToBack();
+  if (currentPhoto) currentPhoto.bringToFront();
   if (currentYearGroup) currentYearGroup.bringToFront();
   currentFrame = fimg;
   canvas.requestRenderAll();
