@@ -59,10 +59,12 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
   100%{transform:translateY(-100vh) scale(0.5)}
 }
 .p1-badge{
-  width:90px;height:90px;margin-bottom:12px;position:relative;z-index:1;
-  background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:"Noto Serif SC",serif;font-size:40px;font-weight:900;color:var(--gold);
-  border:2px solid rgba(255,255,255,0.2);
+  width:100px;height:100px;margin-bottom:12px;position:relative;z-index:1;
+}
+.p1-badge img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))}
+.p1-badge-ring{
+  position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;
+  border:2px solid rgba(255,255,255,0.25);border-radius:50%;pointer-events:none;
 }
 .p1-date{
   font-family:"Noto Serif SC",serif;font-size:16px;color:rgba(255,255,255,0.7);
@@ -281,7 +283,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 <div id="page1">
   <div class="p1-deco" id="p1Deco"></div>
   <div class="p1-date">5 月 4 日</div>
-  <div class="p1-badge">五<br>四</div>
+  <div class="p1-badge"><img src="assets/logo.png" alt="校徽"><div class="p1-badge-ring"></div></div>
   <div class="p1-title">五四青年节</div>
   <div class="p1-sub">传承五四薪火 · 谱写青春华章</div>
   <div class="p1-line"></div>
@@ -294,7 +296,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 <div id="page2">
   <div class="p2-header">
     <div class="p2-header-inner">
-      <span class="icon">五四</span>
+      <img src="assets/logo.png" alt="校徽" style="width:32px;height:32px;object-fit:contain">
       <span class="title-text">青年节 · 专属头像制作</span>
     </div>
     <div class="tagline">传 承 五 四 薪 火</div>
@@ -555,7 +557,8 @@ function selectFrame(index, el) {
     lockMovementX: true, lockMovementY: true,
     lockScalingX: true, lockScalingY: true,
     lockRotation: true,
-    hasBorders: false, hoverCursor: 'default'
+    hasBorders: false, hoverCursor: 'default',
+    opacity: 0.65
   });
   fimg.setControlsVisibility({
     bl: false, br: false, mb: false, ml: false, mr: false,
