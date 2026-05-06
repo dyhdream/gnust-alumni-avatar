@@ -75,7 +75,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 /* Main content */
 .p1-inner{
   position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
-  padding:0 20px;
+  padding:0 20px;width:100%;max-width:420px;
 }
 
 /* Logo badge */
@@ -106,7 +106,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
   font-size:clamp(42px,9vw,72px);font-weight:900;
   color:#fff;text-align:center;line-height:1.1;
   position:relative;z-index:1;
-  letter-spacing:8px;
+  letter-spacing:4px;
   margin-top:20px;
   animation:titleIn 1s 0.2s cubic-bezier(0.22,0.61,0.36,1) both;
 }
@@ -114,6 +114,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
   font-style:normal;
   color:var(--gold);
   text-shadow:0 0 30px rgba(255,210,60,0.5);
+}
+
+/* Credit */
+.p1-credit{
+  margin-top:20px;font-size:11px;color:rgba(255,220,170,0.35);
+  letter-spacing:6px;position:relative;z-index:1;
+  text-align:center;animation:titleIn 1s 0.75s cubic-bezier(0.22,0.61,0.36,1) both;
 }
 @keyframes titleIn{
   from{opacity:0;transform:translateY(40px);filter:blur(8px)}
@@ -328,6 +335,17 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 @media(max-width:380px){
   .frame-grid{grid-template-columns:repeat(3,1fr)}
 }
+@media(max-height:700px){
+  .p1-badge{width:85px;height:85px}
+  .p1-glow{width:170px;height:170px}
+  .p1-title{margin-top:14px;font-size:clamp(34px,8vw,60px)}
+  .p1-sub{margin-top:10px}
+  .p1-line{margin:16px auto 0}
+  .p1-desc{margin-top:10px;font-size:12px}
+  .p1-btn-wrap{margin-top:24px}
+  .p1-btn{padding:13px 44px;font-size:15px}
+  .p1-credit{margin-top:14px}
+}
 </style>
 </head>
 <body>
@@ -353,6 +371,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
       <button class="p1-btn" id="enterBtn">立 即 领 取</button>
       <div class="p1-btn-ring"></div>
     </div>
+    <div class="p1-credit">青春赣科出品</div>
   </div>
   <div class="p1-arrow"></div>
 </div>
