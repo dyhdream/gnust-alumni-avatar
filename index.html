@@ -572,14 +572,14 @@ function loadPhotoFromDataUrl(dataUrl) {
     var r = new Image();
     r.onload = function() {
       var cw = canvas.width, ch = canvas.height;
-      var s = Math.max(cw / r.width, ch / r.height) * 0.92;
+      var s = Math.min(cw / r.width, ch / r.height) * 0.65;
       var fimg = new fabric.Image(r, {
         scaleX: s, scaleY: s, left: cw / 2, top: ch / 2,
         originX: 'center', originY: 'center'
       });
       canvas.add(fimg);
-      fimg.bringToFront();
-      if (currentFrame) currentFrame.sendToBack();
+      fimg.sendToBack();
+      if (currentFrame) currentFrame.bringToFront();
       if (currentYearGroup) currentYearGroup.bringToFront();
       currentPhoto = fimg;
       canvas.requestRenderAll();
