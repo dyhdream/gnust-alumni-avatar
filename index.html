@@ -447,10 +447,8 @@ if (location.protocol === 'file:') {
 
 /* ===== Frame Config ===== */
 var FRAMES = [
-  '01-frame.png','02-frame.jpg','03-frame.jpg','04-frame.jpg',
-  '05-frame.jpg','06-frame.jpg','07-frame.jpg','08-frame.jpg',
-  '09-frame.jpg','10-frame.jpg','11-frame.jpg','12-frame.png',
-  '13-frame.jpg','14-frame.jpg','15-frame.jpg','16-frame.jpg'
+  '01-frame.png','02-frame.png','03-frame.png','04-frame.png',
+  '05-frame.png','06-frame.png','07-frame.png','08-frame.png'
 ];
 
 /* ===== Preload frames ===== */
@@ -575,7 +573,7 @@ function loadPhotoFromDataUrl(dataUrl) {
     var r = new Image();
     r.onload = function() {
       var cw = canvas.width, ch = canvas.height;
-      var s = Math.min(cw / r.width, ch / r.height) * 0.65;
+      var s = Math.max(cw / r.width, ch / r.height) * 0.95;
       var fimg = new fabric.Image(r, {
         scaleX: s, scaleY: s, left: cw / 2, top: ch / 2,
         originX: 'center', originY: 'center'
@@ -645,8 +643,8 @@ function selectFrame(index, el) {
     mt: false, tl: false, tr: false, mtr: false
   });
   canvas.add(fimg);
-  fimg.sendToBack();
-  if (currentPhoto) currentPhoto.bringToFront();
+  fimg.bringToFront();
+  if (currentPhoto) currentPhoto.sendToBack();
   if (currentYearGroup) currentYearGroup.bringToFront();
   currentFrame = fimg;
   canvas.requestRenderAll();
