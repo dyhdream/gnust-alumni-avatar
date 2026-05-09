@@ -279,29 +279,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 .frame-item.selected{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-light)}
 .frame-item img{width:100%;height:100%;object-fit:contain}
 
-/* Year Selector */
-.year-section{
-  width:88vw;max-width:440px;margin:16px auto 0;
-  background:#fff;border-radius:var(--radius-md);
-  padding:14px 16px;border:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-}
-.year-input{
-  width:100px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
-  font-size:15px;font-weight:600;text-align:center;outline:none;transition:var(--transition);
-  color:var(--text);flex-shrink:0;
-}
-.year-input:focus{border-color:var(--primary)}
-.year-suffix{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap}
-.btn-year{
-  padding:7px 16px;border:none;border-radius:var(--radius-sm);
-  font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);
-}
-.btn-year-confirm{background:var(--primary);color:#fff}
-.btn-year-confirm:hover{background:var(--primary-dark)}
-.btn-year-confirm:active{transform:scale(0.97)}
-.btn-year-clear{background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)}
-
 /* Modal */
 #saveModal{
   position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;
@@ -410,13 +387,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Micr
 
   <div class="frame-grid" id="frames-panel"></div>
 
-  <div class="year-section" id="yearSection">
-    <span style="font-size:16px;font-weight:600;color:var(--primary)">届</span>
-    <input class="year-input" id="yearInput" type="text" inputmode="numeric" maxlength="4" placeholder="如 2025">
-    <span class="year-suffix">届校友</span>
-    <button class="btn-year btn-year-confirm" id="yearConfirm">确认</button>
-    <button class="btn-year btn-year-clear" id="yearClear">清除</button>
-  </div>
 </div>
 
 <!-- Modal -->
@@ -492,7 +462,7 @@ document.getElementById('enterBtn').addEventListener('click', function() {
 });
 
 /* ===== Canvas ===== */
-var canvas, currentPhoto, currentFrame, currentYearGroup;
+var canvas, currentPhoto, currentFrame;
 var canvasInitialized = false;
 
 function getCanvasSize() {
@@ -524,7 +494,6 @@ function initCanvas() {
       if (canvas) { canvas.remove(target); canvas.requestRenderAll(); }
       if (target === currentPhoto) currentPhoto = null;
       if (target === currentFrame) currentFrame = null;
-      if (target === currentYearGroup) currentYearGroup = null;
     },
     render: function(ctx, l, t, s, o) {
       var sz2 = 18; ctx.save(); ctx.translate(l, t); ctx.drawImage(delImg, -sz2 / 2, -sz2 / 2, sz2, sz2); ctx.restore();
@@ -583,7 +552,6 @@ function loadPhotoFromDataUrl(dataUrl) {
       canvas.add(fimg);
       fimg.sendToBack();
       if (currentFrame) currentFrame.bringToFront();
-      if (currentYearGroup) currentYearGroup.bringToFront();
       currentPhoto = fimg;
       canvas.requestRenderAll();
       hideLoading();
@@ -647,61 +615,10 @@ function selectFrame(index, el) {
   canvas.add(fimg);
   fimg.bringToFront();
   if (currentPhoto) currentPhoto.sendToBack();
-  if (currentYearGroup) currentYearGroup.bringToFront();
   currentFrame = fimg;
   canvas.requestRenderAll();
   document.getElementById('saveBtn').disabled = false;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ===== Year ===== */
-document.getElementById('yearConfirm').addEventListener('click', applyYear);
-document.getElementById('yearInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); applyYear(); }
-});
-document.getElementById('yearInput').addEventListener('input', function() {
-  this.value = this.value.replace(/\D/g, '');
-});
-document.getElementById('yearClear').addEventListener('click', function() {
-  document.getElementById('yearInput').value = '';
-  if (currentYearGroup) { canvas.remove(currentYearGroup); currentYearGroup = null; canvas.requestRenderAll(); }
-});
-
-function applyYear() {
-  var val = document.getElementById('yearInput').value.trim();
-  if (!val || !/^\d{4}$/.test(val)) return;
-  var y = parseInt(val);
-  if (y < 1906 || y > 2030) return;
-  drawYearRibbon(val);
-}
-
-function drawYearRibbon(year) {
-  if (currentYearGroup) { canvas.remove(currentYearGroup); currentYearGroup = null; }
-  var pc = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-  var text = new fabric.Text(year + '届校友', {
-    fontSize: 22, fill: '#fff', fontFamily: 'sans-serif', fontWeight: 'bold',
-    originX: 'center', originY: 'center'
-  });
-  var pad = 16;
-  var bg = new fabric.Rect({
-    left: -text.width / 2 - pad, top: -text.height / 2 - pad / 2,
-    width: text.width + pad * 2, height: text.height + pad,
-    fill: pc, rx: 20, ry: 20,
-    originX: 'left', originY: 'top'
-  });
-  var group = new fabric.Group([bg, text], {
-    left: canvas.width * 0.04, top: canvas.width * 0.04,
-    originX: 'left', originY: 'top',
-    selectable: true, hasControls: true,
-    cornerColor: '#ef4444', borderColor: '#ef4444',
-    cornerSize: 8
-  });
-  canvas.add(group);
-  group.bringToFront();
-  currentYearGroup = group;
-  canvas.setActiveObject(group);
-  canvas.requestRenderAll();
-  document.getElementById('saveBtn').disabled = false;
 }
 
 /* ===== Save ===== */
